@@ -15,6 +15,10 @@ class Employee {
   generateReport() {
     // Generate Report
   }
+
+  salarayAdvanced() {
+    // Request for Salary Advanced
+  }
 }
 
 // After SRP
@@ -28,4 +32,8 @@ class EmployeeTax {
 
 class EmployeeReport {
   calculateEmployeeReport() {}
+}
+
+class SalaryAdvanced {
+  requestSalaryAdanced() {}
 }

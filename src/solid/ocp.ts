@@ -7,7 +7,6 @@
  */
 
 // Before OCP
-
 class Area {
   width!: number;
   height!: number;
@@ -27,8 +26,12 @@ interface Shape {
 }
 
 class Reactangle implements Shape {
-  height!: number;
-  width!: number;
+  height: number;
+  width: number;
+  constructor(height: number, width: number) {
+    [this.height, this.width] = [height, width]
+  }
+
   calculateArea(): number {
     return this.height * this.width;
   }
@@ -39,8 +42,12 @@ class Reactangle implements Shape {
 }
 
 
-class Circle implements Shape {
-  radius!: number;
+abstract class Circle implements Shape {
+  radius: number;
+
+  constructor(radius: number) {
+    this.radius = radius;
+  }
 
   calculateArea(): number {
     return Math.PI * Math.pow(this.radius, 2);

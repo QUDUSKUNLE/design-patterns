@@ -10,13 +10,9 @@ function createObserver<EventType>(): {
   return {
     subscribe: (listener: Listener<EventType>): () => void => {
       listeners.push(listener);
-      return () => {
-        listeners = listeners.filter(list => list !== listener)
-      }
+      return () => listeners = listeners.filter(list => list !== listener)
     },
-    publish: (event: EventType) => {
-      listeners.forEach(listener => listener(event))
-    }
+    publish: (event: EventType) => listeners.forEach(listener => listener(event))
   }
 }
 
@@ -142,7 +138,6 @@ pokemonDb.instance.set({
 
 pokemonDb.instance.onAfterAdd(({ value }) => console.log(value));
 
-
 pokemonDb.instance.set({
   id: 'Spinosaur',
   attach: 100,
@@ -150,9 +145,5 @@ pokemonDb.instance.set({
 });
 
 pokemonDb.instance.visit(item => console.log(item.id))
-console.log(pokemonDb.instance.get('Bulbasavi'))
 const bestDefensive = pokemonDb.instance.selectBest(({ defence }) => defence);
 const bestAttach = pokemonDb.instance.selectBest(({ attach }) => attach);
-
-console.log(`Best defence is ${bestDefensive?.id}`);
-console.log(`Best attach is ${bestAttach?.id}`);

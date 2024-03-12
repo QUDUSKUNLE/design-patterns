@@ -12,4 +12,3 @@ export type Points = {
 export type Mapped<T> = {
   -readonly [P in keyof T]-?: T[P]
 }
-
