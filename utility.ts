@@ -32,7 +32,6 @@ type Listeners<T> = {
   [Property in keyof T as `on${Capitalize<string & Property>}Change`]?: (val: T[Property]) => void;
 }
 
-
 type GmrssBuild<T, O> = {
   [key in T as `gmrss:${string & keyof key}`]: O
 }

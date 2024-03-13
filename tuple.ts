@@ -10,6 +10,4 @@ function simpleStringState(initial: string): [() => string, (str: string) => voi
 }
 
 const [stringGetter, stringSetter] = simpleStringState('Qudus Yekeen')
-console.log(stringGetter())
 stringSetter('Kunle')
-console.log(stringGetter())

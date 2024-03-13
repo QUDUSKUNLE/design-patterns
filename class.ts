@@ -1,28 +1,59 @@
-
 class Base {
   greet() {
-    return 'Hello, Qudus Yekeen';
+    return "Hello, Qudus Yekeen";
   }
 }
 
-
 class Greater extends Base {
-  readonly name: string = 'Hello World';
-  constructor(otherName?: string) {
+  readonly name: string = "Hello World";
+  public constructor(otherName?: string) {
     super();
-    this.name = otherName ?? this.name
+    this.name = otherName ?? this.name;
   }
 
   state = () => {
-    return this.name
-  }
+    return this.name;
+  };
 
   greet(otherName?: string) {
-    const result = otherName ?? super.greet()
-    return result
+    const result = otherName ?? super.greet();
+    return result;
   }
 }
 
-const ade = new Greater();
+interface CustomerDetail {
+  name: string;
+  balance: number;
+}
 
-console.log(ade.state())
+type CustomerDetails = {
+  [key: string]: CustomerDetail;
+}
+
+abstract class Bank {
+  private readonly customerDetails: CustomerDetails[] = [];
+
+  protected customerName(num: string): string {
+    const customer = this.customerDetails.find((customer: CustomerDetails) => customer[num])
+    return customer ? customer[num].name : 'Not Found';
+  }
+
+  protected customerBalance(num: string): number {
+    const customer = this.customerDetails.find((customer: CustomerDetails) => customer[num])
+    return customer ? customer[num].balance : 0;
+  }
+}
+
+class Customer extends Bank {
+  public constructor(private numbe: number) {
+    super();
+  }
+
+  public getCustomerName() {
+    return super.customerName(`${this.numbe}`);
+  }
+
+  public getCustomerBalance() {
+    return super.customerBalance(`${this.numbe}`);
+  }
+}
