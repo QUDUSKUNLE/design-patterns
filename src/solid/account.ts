@@ -9,7 +9,7 @@ interface Borrow {
   lend(): void;
 }
 
-class SavingsAccount implements Accounts {
+class SavingsAccounts implements Accounts {
   savings (): void {
     throw new Error( "Method not implemented." );
   }
@@ -18,7 +18,7 @@ class SavingsAccount implements Accounts {
   }
 }
 
-class CurrentAccount implements Accounts, Borrow {
+class CurrentAccounts implements Accounts, Borrow {
   lend (): void {
     throw new Error( "Method not implemented." );
   }

@@ -44,7 +44,7 @@ abstract class Bank {
   }
 }
 
-class Customer extends Bank {
+class Customers extends Bank {
   public constructor(private numbe: number) {
     super();
   }
