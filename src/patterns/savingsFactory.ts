@@ -1,33 +1,39 @@
+import { randomInt } from 'crypto';
 
-export interface Savings {
-  savings(): void;
-  debits(): void;
+export interface SavingsAccount {
+  AccountName(): string;
+  SavingsAccountNumber(): string;
 }
 
-abstract class SavingsAccount {
-  public abstract factoryMethod(): Savings;
+abstract class CustomerSavingsAccount {
+  public abstract factoryMethod(): SavingsAccount;
 }
 
-class CreateSavings implements Savings {
-  constructor(private saving: Accounts) {}
-  debits(): void {
-    throw new Error('Method not implemented.');
+class CreateCustomerSavingsAccount implements SavingsAccount {
+  constructor(private firstName: string, private lastName: string) {}
+  AccountName(): string {
+    return `${this.firstName.toLowerCase()} ${this.lastName.toUpperCase()}`
   }
-  savings(): void {
-    throw new Error('Method not implemented.');
+  SavingsAccountNumber(): string {
+    return `s${randomInt(1234567)}`
   }
 }
 
-class CreateSavingsAccount extends SavingsAccount {
-  constructor(private saving: Accounts) {
+class CreateSavingsAccount extends CustomerSavingsAccount {
+  constructor(private firstName: string, private lastName: string) {
     super()
   }
-  public factoryMethod(): Savings {
-    return new CreateSavings(this.saving)
+  public factoryMethod(): SavingsAccount {
+    return new CreateCustomerSavingsAccount(this.firstName, this.lastName);
   }
 }
 
-export function create(savings: SavingsAccount): void {
+export function create(savings: CustomerSavingsAccount): void {
   console.log('Running savings account')
   const savingsAccount = savings.factoryMethod();
+  console.log(savingsAccount.AccountName())
+  console.log(savingsAccount.SavingsAccountNumber());
 }
+
+console.log('Testing Savings account.');
+create(new CreateSavingsAccount('Abdul-Quddus', 'Yekeen'))

@@ -1,35 +1,34 @@
-import { Savings } from "./savingsFactory";
+import { randomInt } from 'crypto';
+import { SavingsAccount } from './savingsFactory';
 
-export interface Currents extends Savings {
-  lends(): void
+export interface CurrentsAccount extends Pick<SavingsAccount, 'AccountName'> {
+  CurrentsAccountNumber(): string
 }
 
-abstract class CurrentAccount {
-  public abstract factoryMethod(): Currents
+abstract class CustomerCurrentsAccountCreator {
+  public abstract factoryMethod(): CurrentsAccount;
 }
 
-class CreateCurrents implements Currents {
-  lends (): void {
-    throw new Error( "Method not implemented." );
+class CustomerCurrentsAccount implements CurrentsAccount {
+  constructor(private firstName: string, private lastName: string) {}
+  AccountName(): string {
+    return `${this.firstName.toLowerCase()} ${this.lastName.toUpperCase()}`
   }
-  savings (): void {
-    throw new Error( "Method not implemented." );
-  }
-  debits (): void {
-    throw new Error( "Method not implemented." );
+  CurrentsAccountNumber(): string {
+    return `c${randomInt(1234567)}`
   }
 }
 
-class CreateCurrentAccount extends CurrentAccount {
-  constructor() {
+class CreateCurrentsAccount extends CustomerCurrentsAccountCreator {
+  constructor(private firstName: string, private lastName: string) {
     super()
   }
-  public factoryMethod(): Currents {
-    return new CreateCurrents()
+  public factoryMethod(): CurrentsAccount {
+    return new CustomerCurrentsAccount(this.firstName, this.lastName)
   }
 }
 
-export function create(current: CurrentAccount): void {
+export function create(current: CustomerCurrentsAccountCreator): void {
   console.log('Running current account')
   const currentAccount = current.factoryMethod();
 }
