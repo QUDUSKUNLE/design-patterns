@@ -5,6 +5,7 @@ import { CurrentsAccount } from './currentFactory';
 enum ACCOUNTTYPE {
   SAVINGS = 'SAVINGS',
   CURRENTS = 'CURRENTS',
+  BOTH = 'BOTH',
 }
 
 interface AccountName {
@@ -12,11 +13,12 @@ interface AccountName {
 }
 
 interface CustomerSavingsInterface extends AccountName, SavingsAccount {}
-interface CustomerCurrentsInterface extends AccountName, CurrentsAccount {}
+interface CustomerCurrentsInterface extends Pick<CustomerSavingsInterface, 'AccountName'>, CurrentsAccount {}
+interface CustomerBothInterface extends CustomerSavingsInterface, CurrentsAccount {}
 
 
 abstract class CustomerAccountsFactory {
-  public abstract factoryMethod(): CustomerSavingsInterface | CustomerCurrentsInterface
+  public abstract factoryMethod(): CustomerSavingsInterface | CustomerCurrentsInterface | CustomerBothInterface
 }
 
 class CustomerAccountName {
@@ -35,7 +37,7 @@ class CustomerSavingsFactory extends CustomerAccountName implements CustomerSavi
   }
 }
 
-class CustomerCurrentFactory extends CustomerAccountName implements CustomerCurrentsInterface {
+class CustomerCurrentFactory extends CustomerSavingsFactory implements CustomerCurrentsInterface {
   constructor(firstName: string, lastName: string) {
     super(firstName, lastName)
   }
@@ -44,29 +46,35 @@ class CustomerCurrentFactory extends CustomerAccountName implements CustomerCurr
   }
 }
 
+class CustomerBothFactory extends CustomerCurrentFactory implements CustomerBothInterface {
+  constructor(firstName: string, lastName: string) {
+    super(firstName, lastName)
+  }
+}
+
 class CreateCustomerAccounts extends CustomerAccountsFactory {
   constructor(private readonly firstName: string, private readonly lastName: string, private accountType: ACCOUNTTYPE) {
     super()
   }
-  public factoryMethod(): CustomerSavingsInterface | CustomerCurrentsInterface {
+  public factoryMethod(): CustomerSavingsInterface | CustomerCurrentsInterface | CustomerBothInterface {
     if (this.accountType === ACCOUNTTYPE.SAVINGS) return new CustomerSavingsFactory(this.firstName, this.lastName);
-    return new CustomerCurrentFactory(this.firstName, this.lastName);
+    if (this.accountType === ACCOUNTTYPE.CURRENTS) return new CustomerCurrentFactory(this.firstName, this.lastName);
+    return new CustomerBothFactory(this.firstName, this.lastName);
   }
 }
 
 export function create(gtb: CustomerAccountsFactory, ENUMS: ACCOUNTTYPE) {
   switch (ENUMS) {
-    case ACCOUNTTYPE.CURRENTS:
-      const account = gtb.factoryMethod() as CustomerCurrentsInterface
-      console.log(account.CurrentsAccountNumber());
-      console.log(account.AccountName())
+    case ACCOUNTTYPE.SAVINGS:
+      gtb.factoryMethod() as CustomerSavingsInterface
       break;
-    case ACCOUNTTYPE.SAVINGS: 
-      const savings = gtb.factoryMethod() as CustomerSavingsInterface
-      console.log(savings.SavingsAccountNumber());
-      console.log(savings.AccountName());
+    case ACCOUNTTYPE.CURRENTS:
+      gtb.factoryMethod() as CustomerCurrentsInterface
+      break;
+    case ACCOUNTTYPE.BOTH:
+      gtb.factoryMethod() as CustomerBothInterface
       break;
   }
 }
 
-create(new CreateCustomerAccounts('Abdul-Quddus', 'Yekeen', ACCOUNTTYPE.CURRENTS), ACCOUNTTYPE.CURRENTS)
+create(new CreateCustomerAccounts('Abdul-Quddus', 'Yekeen', ACCOUNTTYPE.SAVINGS), ACCOUNTTYPE.SAVINGS)
