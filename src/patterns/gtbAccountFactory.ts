@@ -18,7 +18,7 @@ interface CustomerBothInterface extends CustomerSavingsInterface, CurrentsAccoun
 
 
 abstract class CustomerAccountsFactory {
-  public abstract factoryMethod(): CustomerSavingsInterface | CustomerCurrentsInterface | CustomerBothInterface
+  public abstract FactoryMethod(): CustomerSavingsInterface | CustomerCurrentsInterface | CustomerBothInterface
 }
 
 class CustomerAccountName {
@@ -56,7 +56,7 @@ class CreateCustomerAccounts extends CustomerAccountsFactory {
   constructor(private readonly firstName: string, private readonly lastName: string, private accountType: ACCOUNTTYPE) {
     super()
   }
-  public factoryMethod(): CustomerSavingsInterface | CustomerCurrentsInterface | CustomerBothInterface {
+  public FactoryMethod(): CustomerSavingsInterface | CustomerCurrentsInterface | CustomerBothInterface {
     if (this.accountType === ACCOUNTTYPE.SAVINGS) return new CustomerSavingsFactory(this.firstName, this.lastName);
     if (this.accountType === ACCOUNTTYPE.CURRENTS) return new CustomerCurrentFactory(this.firstName, this.lastName);
     return new CustomerBothFactory(this.firstName, this.lastName);
@@ -66,13 +66,13 @@ class CreateCustomerAccounts extends CustomerAccountsFactory {
 export function create(gtb: CustomerAccountsFactory, ENUMS: ACCOUNTTYPE) {
   switch (ENUMS) {
     case ACCOUNTTYPE.SAVINGS:
-      gtb.factoryMethod() as CustomerSavingsInterface
+      gtb.FactoryMethod() as CustomerSavingsInterface
       break;
     case ACCOUNTTYPE.CURRENTS:
-      gtb.factoryMethod() as CustomerCurrentsInterface
+      gtb.FactoryMethod() as CustomerCurrentsInterface
       break;
     case ACCOUNTTYPE.BOTH:
-      gtb.factoryMethod() as CustomerBothInterface
+      gtb.FactoryMethod() as CustomerBothInterface
       break;
   }
 }

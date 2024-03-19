@@ -7,13 +7,13 @@ export interface Ledger {
 }
 
 export interface Transaction {
-  debits(amount: number): void;
-  credit(amount: number): void;
-  lends(amount: number): void;
+  Debits(amount: number): void;
+  Credit(amount: number): void;
+  Lends(amount: number): void;
 }
 
 abstract class CustomerTransaction {
-  public abstract factoryMethod(): Transaction;
+  public abstract FactoryMethod(): Transaction;
 }
 
 class CreateCustomerTransactions implements Transaction {
@@ -30,19 +30,22 @@ class CreateCustomerTransactions implements Transaction {
     })()
     this.customer = this.ledger[this.accountNumber]
   }
-  debits(amount: number): void {
-    if (this.customer.balance < amount) {
-      console.log(`Your balance is ${this.customer.balance}`);
-      throw new Error('Insufficient balance.')
+  Debits(amount: number): void {
+    if (this.customer) {
+      if (this.customer.balance < amount) {
+        console.log(`Your balance is ${this.customer.balance}`);
+        throw new Error('Insufficient balance.')
+      }
+      this.customer.balance -= amount;
+      this.ledger[this.accountNumber] = this.customer;
+      fs.writeFile(path.join(__dirname, 'ledger.json'), JSON.stringify(this.ledger, null, 2), (error) => {
+        if (error) {}
+        console.log('Data written successfully.');
+      })
     }
-    this.customer.balance -= amount;
-    this.ledger[this.accountNumber] = this.customer;
-    fs.writeFile(path.join(__dirname, 'ledger.json'), JSON.stringify(this.ledger, null, 2), (error) => {
-      if (error) {}
-      console.log('Data written successfully.');
-    })
+    throw new Error('Unknown customer.');
   }
-  credit(amount: number): void {
+  Credit(amount: number): void {
     this.customer.balance += amount;
     this.ledger[this.accountNumber] = this.customer;
     fs.writeFile(path.join(__dirname, 'ledger.json'), JSON.stringify(this.ledger, null, 2), (error) => {
@@ -50,7 +53,7 @@ class CreateCustomerTransactions implements Transaction {
       console.log('Data written successfully.');
     })
   }
-  lends(amount: number): string {
+  Lends(amount: number): string {
     throw new Error('Method not implemented.');
   }
 }
@@ -59,14 +62,12 @@ class CreateCustomerTransaction extends CustomerTransaction {
   constructor(private readonly accountNumber: string) {
     super()
   }
-  public factoryMethod(): Transaction {
+  public FactoryMethod(): Transaction {
     return new CreateCustomerTransactions(this.accountNumber)
   }
 }
 
-function create(savings: CustomerTransaction) {
-  const saving = savings.factoryMethod();
-  saving.debits(50000);
+export function create(savings: CustomerTransaction) {
+  const saving = savings.FactoryMethod();
+  saving.Debits(50000);
 }
-
-create(new CreateCustomerTransaction('s779561'))

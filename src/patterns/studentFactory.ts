@@ -9,7 +9,7 @@ interface Student {
 }
 
 abstract class Flower {
-  public abstract factoryMethod(): Student;
+  public abstract FactoryMethod(): Student;
 }
 
 class CreateStudent implements Student {
@@ -32,19 +32,11 @@ class CreateFlower extends Flower {
   constructor(private firstName: string, private lastName: string) {
     super()
   }
-  public factoryMethod(): Student {
+  public FactoryMethod(): Student {
     return new CreateStudent(this.firstName, this.lastName)
   }
 }
 
-function create(flower: Flower) {
-  console.log('Hooray, a new student just joined us.')
-  const newFlower = flower.factoryMethod();
-  console.log(newFlower.fullName());
-  console.log(newFlower.department());
-  console.log(newFlower.matricNumber());
-  console.log(newFlower.courses());
+export function create(flower: Flower) {
+  flower.FactoryMethod();
 }
-
-console.log('Launched: Flower App');
-create(new CreateFlower('Abdul-Quddus', 'Yekeen'))
