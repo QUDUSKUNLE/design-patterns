@@ -48,9 +48,3 @@ export class ConcreteCreator extends Creation {
     return new ConcreteProduct(this.length, this.width);
   }
 }
-
-function clientCode(creator: Creation) {
-  console.log('Client: I\'m not aware of the creator\'s class, but it still works.')
-  const area = creator.factoryMethod();
-  console.log(area.area());
-}

@@ -35,7 +35,3 @@ export class CreateFlower extends Flower {
     return new CreateStudent(this.firstName, this.lastName)
   }
 }
-
-function create(flower: Flower) {
-  flower.FactoryMethod();
-}

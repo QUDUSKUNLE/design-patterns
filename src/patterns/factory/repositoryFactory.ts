@@ -13,7 +13,6 @@ interface Repository {
   Password?: string;
 }
 
-
 interface RepositoryTransactions {
   Read(): void;
   Write(): void;
@@ -59,8 +58,4 @@ export class CreateRepositoryTransactionFactory extends RepositoryTransaction {
   public FactoryMethod (): RepositoryTransactions {
     return new RepositoryTransactionFactory(this.conn)
   }
-}
-
-function create(repository: RepositoryTransaction) {
-  repository.FactoryMethod()
 }

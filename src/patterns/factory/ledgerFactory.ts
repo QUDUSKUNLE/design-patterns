@@ -54,7 +54,3 @@ export class CreateLedgerTransactionFactory extends LedgerTransaction {
     return new LedgerTrasctionsFactory();
   }
 }
-
-function create(ledgerTransaction: LedgerTransaction) {
-  ledgerTransaction.FactoryMethod()
-}
