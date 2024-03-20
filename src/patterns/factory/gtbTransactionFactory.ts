@@ -77,8 +77,8 @@ class CreateCustomerTransactions implements Transaction {
   Borrow(borrow: BorrowTransaction): boolean {
     const borrowerID = borrow?.BorrowerID as string
     const borrower = this.ledger[borrowerID];
-    if (borrower && borrower.Balance < borrow.BorrowAmount) throw new Error(
-      'The borrower can\'t afford the amount at the moment.')
+    if (borrower && borrower.Balance <= borrow.BorrowAmount) throw new Error(
+      'The borrower can\'t afford this amount at the moment.')
     delete borrow.BorrowerID;
     if (this.FilterBorrower(borrower.Borrow, borrow.LenderID)) throw new Error(
       'You have a pending request from this lender.')
@@ -167,7 +167,7 @@ export class CreateCustomerTransaction extends CustomerTransaction {
 function create(transaction: CustomerTransaction) {
   const transact = transaction.FactoryMethod();
   transact.Lend({
-    LendAmount: 1000,
+    LendAmount: 10000,
     PaymentRate: 100,
     BorrowerID: 's234556',
     LendID: '1',
