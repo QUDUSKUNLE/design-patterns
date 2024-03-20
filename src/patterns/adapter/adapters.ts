@@ -12,7 +12,6 @@ class Iphones implements Iphone {
   }
 }
 
-
 class Androids implements Android {
   useMicroUSB(): void {
     throw new Error("Method not implemented.");

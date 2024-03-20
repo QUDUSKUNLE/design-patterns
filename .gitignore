@@ -4,3 +4,4 @@ ledger.json
 
 logs.txt
 node_modules
+.env

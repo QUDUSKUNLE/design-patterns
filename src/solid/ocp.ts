@@ -26,11 +26,7 @@ interface Shape {
 }
 
 class Reactangle implements Shape {
-  height: number;
-  width: number;
-  constructor(height: number, width: number) {
-    [this.height, this.width] = [height, width]
-  }
+  constructor(private height: number, private width: number) {}
 
   calculateArea(): number {
     return this.height * this.width;
@@ -42,12 +38,8 @@ class Reactangle implements Shape {
 }
 
 
-abstract class Circle implements Shape {
-  radius: number;
-
-  constructor(radius: number) {
-    this.radius = radius;
-  }
+class Circle implements Shape {
+  constructor(private radius: number) {}
 
   calculateArea(): number {
     return Math.PI * Math.pow(this.radius, 2);
