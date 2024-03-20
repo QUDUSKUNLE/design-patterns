@@ -73,6 +73,7 @@ class CreateCustomerTransactions implements Transaction {
     })()
     this.customer = this.ledger[this.accountNumber]
   }
+
   Borrow(borrow: BorrowTransaction): boolean {
     const borrowerID = borrow?.BorrowerID as string
     const borrower = this.ledger[borrowerID];
@@ -92,6 +93,7 @@ class CreateCustomerTransactions implements Transaction {
     })
     return true;
   }
+
   Debits(amount: number): void {
     if (this.customer && this.customer.Balance > amount) {
       this.customer.Balance -= amount;
@@ -105,6 +107,7 @@ class CreateCustomerTransactions implements Transaction {
     }
     throw new Error('Unknown customer.');
   }
+
   Credit(amount: number): void {
     this.customer.Balance += amount;
     this.ledger[this.accountNumber] = this.customer;
@@ -115,6 +118,7 @@ class CreateCustomerTransactions implements Transaction {
     })
     return;
   }
+
   async Lend(lend: LendTransaction): Promise<void> {
     if (this.customer && this.customer.Balance >= 5000) {
       [lend.PaidTimes, lend.HavePaid] = [0, 0];
