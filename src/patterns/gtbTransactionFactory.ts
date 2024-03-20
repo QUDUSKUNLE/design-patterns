@@ -58,16 +58,11 @@ class CreateCustomerTransactions implements Transaction {
   }
 }
 
-class CreateCustomerTransaction extends CustomerTransaction {
+export class CreateCustomerTransaction extends CustomerTransaction {
   constructor(private readonly accountNumber: string) {
     super()
   }
   public FactoryMethod(): Transaction {
     return new CreateCustomerTransactions(this.accountNumber)
   }
-}
-
-export function create(savings: CustomerTransaction) {
-  const saving = savings.FactoryMethod();
-  saving.Debits(50000);
 }

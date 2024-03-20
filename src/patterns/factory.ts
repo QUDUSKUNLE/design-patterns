@@ -40,8 +40,7 @@ class ConcreteProduct implements Product {
   }
 }
 
-
-class ConcreteCreator extends Creation {
+export class ConcreteCreator extends Creation {
   constructor(private length: number, private width: number) {
     super()
   }
@@ -50,13 +49,8 @@ class ConcreteCreator extends Creation {
   }
 }
 
-
 function clientCode(creator: Creation) {
   console.log('Client: I\'m not aware of the creator\'s class, but it still works.')
   const area = creator.factoryMethod();
   console.log(area.area());
 }
-
-// Testing the 
-console.log('App: Launched with the ConcreteProduct')
-clientCode(new ConcreteCreator(4, 2));

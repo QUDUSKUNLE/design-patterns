@@ -1,4 +1,3 @@
-
 enum TransactionsEnum {
   DEBIT = 'DEBIT',
   CREDIT = 'CREDIT',
@@ -6,11 +5,22 @@ enum TransactionsEnum {
   PURCHASE = 'PURCHASE'
 }
 
+enum TransactionStatus {
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  PENDING = 'PENDING',
+  CANCELLED = 'CANCELLED',
+}
+
 interface LedgerInterface {
   TransactionID: string
-  AccountID: string;
+  TransferID: string;
+  TransferBankID: string;
   TransactionType: TransactionsEnum,
+  Status: TransactionStatus;
   Amount: number;
+  ReceiverID?: string;
+  ReceiverBankID?: string;
 }
 
 interface LedgerTransactions<T> {
@@ -39,12 +49,12 @@ class LedgerTrasctionsFactory implements LedgerTransactions<LedgerInterface> {
   }
 }
 
-class CreateLedgerTransactionFactory extends LedgerTransaction {
+export class CreateLedgerTransactionFactory extends LedgerTransaction {
   public FactoryMethod (): LedgerTransactions<LedgerInterface> {
-    return new LedgerTrasctionsFactory()
+    return new LedgerTrasctionsFactory();
   }
 }
 
-export function create(ledgerTransaction: LedgerTransaction) {
+function create(ledgerTransaction: LedgerTransaction) {
   ledgerTransaction.FactoryMethod()
 }

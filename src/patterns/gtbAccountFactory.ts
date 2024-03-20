@@ -16,12 +16,11 @@ interface CustomerSavingsInterface extends AccountName, SavingsAccount {}
 interface CustomerCurrentsInterface extends Pick<CustomerSavingsInterface, 'AccountName'>, CurrentsAccount {}
 interface CustomerBothInterface extends CustomerSavingsInterface, CurrentsAccount {}
 
-
 abstract class CustomerAccountsFactory {
   public abstract FactoryMethod(): CustomerSavingsInterface | CustomerCurrentsInterface | CustomerBothInterface
 }
 
-class CustomerAccountName {
+abstract class CustomerAccountName {
   constructor(private firstName: string, private lastName: string) {}
   AccountName(): string {
     return `${this.firstName.toLowerCase()} ${this.lastName.toUpperCase()}`
@@ -52,7 +51,7 @@ class CustomerBothFactory extends CustomerCurrentFactory implements CustomerBoth
   }
 }
 
-class CreateCustomerAccounts extends CustomerAccountsFactory {
+export class CreateCustomerAccounts extends CustomerAccountsFactory {
   constructor(private readonly firstName: string, private readonly lastName: string, private accountType: ACCOUNTTYPE) {
     super()
   }
@@ -63,7 +62,7 @@ class CreateCustomerAccounts extends CustomerAccountsFactory {
   }
 }
 
-export function create(gtb: CustomerAccountsFactory, ENUMS: ACCOUNTTYPE) {
+function create(gtb: CustomerAccountsFactory, ENUMS: ACCOUNTTYPE) {
   switch (ENUMS) {
     case ACCOUNTTYPE.SAVINGS:
       gtb.FactoryMethod() as CustomerSavingsInterface
@@ -76,5 +75,3 @@ export function create(gtb: CustomerAccountsFactory, ENUMS: ACCOUNTTYPE) {
       break;
   }
 }
-
-create(new CreateCustomerAccounts('Abdul-Quddus', 'Yekeen', ACCOUNTTYPE.SAVINGS), ACCOUNTTYPE.SAVINGS)

@@ -1,6 +1,5 @@
 import { randomInt } from "crypto";
 
-
 interface Student {
   fullName(): string;
   matricNumber(): string;
@@ -28,7 +27,7 @@ class CreateStudent implements Student {
   }
 }
 
-class CreateFlower extends Flower {
+export class CreateFlower extends Flower {
   constructor(private firstName: string, private lastName: string) {
     super()
   }
@@ -37,6 +36,6 @@ class CreateFlower extends Flower {
   }
 }
 
-export function create(flower: Flower) {
+function create(flower: Flower) {
   flower.FactoryMethod();
 }

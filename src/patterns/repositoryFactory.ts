@@ -52,7 +52,7 @@ class RepositoryTransactionFactory extends ConnectRepository implements Reposito
   }
 }
 
-class CreateRepositoryTransactionFactory extends RepositoryTransaction {
+export class CreateRepositoryTransactionFactory extends RepositoryTransaction {
   constructor(private conn: Repository) {
     super();
   }
@@ -61,6 +61,6 @@ class CreateRepositoryTransactionFactory extends RepositoryTransaction {
   }
 }
 
-export function create(repository: RepositoryTransaction) {
+function create(repository: RepositoryTransaction) {
   repository.FactoryMethod()
 }
