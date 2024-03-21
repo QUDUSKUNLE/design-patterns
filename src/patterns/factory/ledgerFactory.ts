@@ -1,8 +1,8 @@
 enum TransactionsEnum {
   DEBIT = 'DEBIT',
   CREDIT = 'CREDIT',
-  LEND = 'LEND',
-  PURCHASE = 'PURCHASE'
+  LOAN = 'LOAN',
+  PURCHASE = 'PURCHASE',
 }
 
 enum TransactionStatus {
@@ -19,6 +19,8 @@ interface LedgerInterface {
   TransactionType: TransactionsEnum,
   Status: TransactionStatus;
   Amount: number;
+  LedgerCreatedAt: Date;
+  LedgerUpdatedAt: Date;
   ReceiverID?: string;
   ReceiverBankID?: string;
 }
@@ -27,7 +29,9 @@ interface LedgerTransactions<T> {
   DebitLedger(ok: T): void;
   CreditLedger(ok: T): void;
   LendLedger(ok: T): void;
+  BorrowLedger(ok: T): void;
   PurchaseLedger(ok: T): void;
+  ApproveBorrowsLedger(ok: T): void;
 }
 
 abstract class LedgerTransaction {
@@ -35,6 +39,12 @@ abstract class LedgerTransaction {
 }
 
 class LedgerTrasctionsFactory implements LedgerTransactions<LedgerInterface> {
+  ApproveBorrowsLedger ( ok: LedgerInterface ): void {
+    throw new Error( "Method not implemented." );
+  }
+  BorrowLedger ( ok: LedgerInterface ): void {
+    throw new Error( "Method not implemented." );
+  }
   DebitLedger(ok: LedgerInterface): void {
     throw new Error('Method not implemented.');
   }
