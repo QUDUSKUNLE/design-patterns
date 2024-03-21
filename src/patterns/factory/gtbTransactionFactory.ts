@@ -122,11 +122,7 @@ class CreateCustomerTransactions implements Transaction {
         }, {} as LendTransaction)
       }
       default: {
-        fs.writeFile(
-          path.join(__dirname, 'ledger.json'),
-          JSON.stringify(this.ledger, null, 2), (error) => {
-          if (error) {}
-        })
+        this.writeDB()
       }
     }
   }
@@ -155,11 +151,7 @@ class CreateCustomerTransactions implements Transaction {
     if (this.customer && this.customer.Balance > amount) {
       this.customer.Balance -= amount;
       this.ledger[this.accountNumber] = this.customer;
-      fs.writeFile(
-        path.join(__dirname, 'ledger.json'),
-        JSON.stringify(this.ledger, null, 2), (error) => {
-        if (error) {}
-      })
+      this.writeDB()
       return;
     }
     throw new Error('Unknown customer.');
@@ -168,11 +160,7 @@ class CreateCustomerTransactions implements Transaction {
   Credits(amount: number): void {
     this.customer.Balance += amount;
     this.ledger[this.accountNumber] = this.customer;
-    fs.writeFile(
-      path.join(__dirname, 'ledger.json'),
-      JSON.stringify(this.ledger, null, 2), (error) => {
-      if (error) {}
-    })
+    this.writeDB()
     return;
   }
 
@@ -196,11 +184,7 @@ class CreateCustomerTransactions implements Transaction {
         UpdatedAt: lend.UpdatedAt,
       }
       await this.borrow(borrow);
-      fs.writeFile(
-        path.join(__dirname, 'ledger.json'),
-        JSON.stringify(this.ledger, null, 2), (error) => {
-        if (error) {}
-      })
+      this.writeDB()
       return;
     }
     throw new Error('Authorized to perform this transaction')
@@ -216,13 +200,7 @@ class CreateCustomerTransactions implements Transaction {
       'You have a pending request from this lender.')
     this.ledger[borrowerID].Borrow.push(borrow)
     this.ledger[borrowerID] = borrower;
-    fs.writeFile(
-      path.join(__dirname, 'ledger.json'),
-      JSON.stringify(this.ledger, null, 2), (error) => {
-      if (error) {
-        throw new Error(`Error lending money from ${borrowerID}`);
-      }
-    })
+    this.writeDB()
     return true;
   }
 
@@ -259,14 +237,18 @@ class CreateCustomerTransactions implements Transaction {
       default:
         if (result) {
           this.ledger[this.accountNumber] = this.customer;
-          fs.writeFile(
-            path.join(__dirname, 'ledger.json'),
-            JSON.stringify(this.ledger, null, 2), (error) => {
-            if (error) {}
-          })
+          this.writeDB()
         }
     }
     return result;
+  }
+
+  private writeDB(): void {
+    fs.writeFile(
+      path.join(__dirname, 'ledger.json'),
+      JSON.stringify(this.ledger, null, 2), (error) => {
+      if (error) {}
+    })
   }
 }
 
