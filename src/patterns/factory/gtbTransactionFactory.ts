@@ -152,7 +152,6 @@ class CreateCustomerTransactions implements Transaction {
       this.customer.Balance -= amount;
       this.ledger[this.accountNumber] = this.customer;
       this.writeDB()
-      return;
     }
     throw new Error('Unknown customer.');
   }
@@ -161,7 +160,6 @@ class CreateCustomerTransactions implements Transaction {
     this.customer.Balance += amount;
     this.ledger[this.accountNumber] = this.customer;
     this.writeDB()
-    return;
   }
 
   async Lends(lend: LendTransaction): Promise<void> {
@@ -185,7 +183,6 @@ class CreateCustomerTransactions implements Transaction {
       }
       await this.borrow(borrow);
       this.writeDB()
-      return;
     }
     throw new Error('Authorized to perform this transaction')
   }
