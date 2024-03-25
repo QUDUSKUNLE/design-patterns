@@ -1,6 +1,7 @@
 dist/
 data.json
 ledger.json
+transactionLedger.json
 
 logs.txt
 node_modules
