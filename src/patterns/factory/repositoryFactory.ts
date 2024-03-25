@@ -1,5 +1,7 @@
+import fs from 'fs';
+import path from 'path';
 
-enum RepositoryType {
+export enum RepositoryType {
   MONGODB = 'mongodb',
   POSTGRES = 'pg'
 }
@@ -14,8 +16,8 @@ interface Repository {
 }
 
 interface RepositoryTransactions {
-  Read(): void;
-  Write(): void;
+  Read(): Promise<Record<string, unknown> | unknown[]>;
+  Write(record: Record<string, unknown> | unknown[]): void;
   Edit(): void;
   Delete(): void;
 }
@@ -37,11 +39,21 @@ class RepositoryTransactionFactory extends ConnectRepository implements Reposito
   constructor(private conn: Repository) {
     super(conn)
   }
-  Read(): void {
-    throw new Error('Method not implemented.');
+  async Read(): Promise<Record<string, unknown> | unknown[]> {
+    try {
+    const data = fs.readFileSync(
+      path.join(__dirname, this.conn.Database), 'utf8')
+      return JSON.parse(data) as unknown as Record<string, unknown>;
+    } catch (error) {
+      throw error;
+    }
   }
-  Write(): void {
-    throw new Error('Method not implemented.');
+  Write(record: Record<string, unknown> | unknown[]): void {
+    fs.writeFile(
+      path.join(__dirname, this.conn.Database),
+      JSON.stringify(record, null, 2), (error) => {
+      if (error) {}
+    })
   }
   Edit(): void {
     throw new Error('Method not implemented.');

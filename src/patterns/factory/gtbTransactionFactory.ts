@@ -1,6 +1,8 @@
 import { randomUUID } from 'crypto';
 import fs from 'fs';
 import path from 'path';
+import { CreateLedgerTransactionFactory, LedgerTransactions, LedgerInterface, TransactionsEnum, TransactionStatus } from './ledgerFactory';
+import { CreateRepositoryTransactionFactory, RepositoryType } from './repositoryFactory';
 
 interface Ledger {
   Balance: number;
@@ -79,13 +81,18 @@ abstract class CustomerTransaction {
 
 class CreateCustomerTransactions implements Transaction {
   private customer: Ledger;
+  private database: string = 'ledger.json'
   private ledger: Record<string, Ledger> = {}
+  private ledgerFactory: CreateLedgerTransactionFactory = new CreateLedgerTransactionFactory(true)
+  private logLedger: LedgerTransactions<LedgerInterface> = this.ledgerFactory.FactoryMethod();
+  private repositoryFactory: CreateRepositoryTransactionFactory = new CreateRepositoryTransactionFactory({ Host: '', Port: 1, Database: this.database, DatabaseType: RepositoryType.POSTGRES });
+  private repository = this.repositoryFactory.FactoryMethod()
 
   constructor(private accountNumber: string) {
     (() => {
       try {
         const data = fs.readFileSync(
-          path.join(__dirname, 'ledger.json'),
+          path.join(__dirname, this.database),
           'utf8'
         )
         this.ledger = JSON.parse(data);
@@ -122,7 +129,7 @@ class CreateCustomerTransactions implements Transaction {
         }, {} as LendTransaction)
       }
       default: {
-        this.writeDB()
+        this.repository.Write(this.ledger);
       }
     }
   }
@@ -148,10 +155,22 @@ class CreateCustomerTransactions implements Transaction {
   }
 
   Debits(amount: number): void {
-    if (this.customer && this.customer.Balance > amount) {
+    if (this.customer && this.customer.Balance >= amount) {
       this.customer.Balance -= amount;
       this.ledger[this.accountNumber] = this.customer;
-      this.writeDB()
+      this.repository.Write(this.ledger);
+      const ID = this.logLedger.GenerateLedgerTransactionID();
+      this.logLedger.DebitLedger({
+        TransactionID: ID,
+        AccountID: this.accountNumber,
+        TransactionType: TransactionsEnum.DEBIT,
+        TransferBankID: '2',
+        Status: TransactionStatus.PENDING,
+        Amount: amount,
+        LedgerCreatedAt: new Date(),
+        LedgerUpdatedAt: new Date(),
+      })
+      return;
     }
     throw new Error('Unknown customer.');
   }
@@ -159,7 +178,18 @@ class CreateCustomerTransactions implements Transaction {
   Credits(amount: number): void {
     this.customer.Balance += amount;
     this.ledger[this.accountNumber] = this.customer;
-    this.writeDB()
+    this.repository.Write(this.ledger);
+    const ID = this.logLedger.GenerateLedgerTransactionID();
+    this.logLedger.CreditLedger({
+      TransactionID: ID,
+      AccountID: this.accountNumber,
+      TransactionType: TransactionsEnum.CREDIT,
+      TransferBankID: '2',
+      Status: TransactionStatus.PENDING,
+      Amount: amount,
+      LedgerCreatedAt: new Date(),
+      LedgerUpdatedAt: new Date(),
+    })
   }
 
   async Lends(lend: LendTransaction): Promise<void> {
@@ -182,7 +212,7 @@ class CreateCustomerTransactions implements Transaction {
         UpdatedAt: lend.UpdatedAt,
       }
       await this.borrow(borrow);
-      this.writeDB()
+      this.repository.Write(this.ledger);
     }
     throw new Error('Authorized to perform this transaction')
   }
@@ -197,7 +227,7 @@ class CreateCustomerTransactions implements Transaction {
       'You have a pending request from this lender.')
     this.ledger[borrowerID].Borrow.push(borrow)
     this.ledger[borrowerID] = borrower;
-    this.writeDB()
+    this.repository.Write(this.ledger);
     return true;
   }
 
@@ -234,18 +264,10 @@ class CreateCustomerTransactions implements Transaction {
       default:
         if (result) {
           this.ledger[this.accountNumber] = this.customer;
-          this.writeDB()
+          this.repository.Write(this.ledger);
         }
     }
     return result;
-  }
-
-  private writeDB(): void {
-    fs.writeFile(
-      path.join(__dirname, 'ledger.json'),
-      JSON.stringify(this.ledger, null, 2), (error) => {
-      if (error) {}
-    })
   }
 }
 
@@ -279,6 +301,7 @@ function create(transaction: CustomerTransaction) {
   //   Status: LendStatus.DECLINED,
   // })
   // console.log(transact.Debts(LendStatus.DECLINED))
+  transact.Credits(50000);
 }
 
-// create(new CreateCustomerTransaction('s779561'))
+create(new CreateCustomerTransaction('s779561'))
