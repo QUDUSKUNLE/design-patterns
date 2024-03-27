@@ -1,11 +1,11 @@
-import { randomInt } from "crypto";
-import { SavingsAccount } from "./savingsFactory";
-import { CurrentsAccount } from "./currentFactory";
+import { randomInt } from 'crypto';
+import { SavingsAccount } from './savingsFactory';
+import { CurrentsAccount } from './currentFactory';
 
 enum ACCOUNTTYPE {
-  SAVINGS = "SAVINGS",
-  CURRENTS = "CURRENTS",
-  BOTH = "BOTH",
+  SAVINGS = 'SAVINGS',
+  CURRENTS = 'CURRENTS',
+  BOTH = 'BOTH',
 }
 
 interface AccountName {
@@ -14,7 +14,7 @@ interface AccountName {
 
 interface CustomerSavingsInterface extends AccountName, SavingsAccount {}
 interface CustomerCurrentsInterface
-  extends Pick<CustomerSavingsInterface, "AccountName">,
+  extends Pick<CustomerSavingsInterface, 'AccountName'>,
     CurrentsAccount {}
 interface CustomerBothInterface
   extends CustomerSavingsInterface,

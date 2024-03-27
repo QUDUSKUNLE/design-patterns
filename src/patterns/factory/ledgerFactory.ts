@@ -1,23 +1,23 @@
-import { randomUUID } from "crypto";
-import fs from "fs";
-import path from "path";
+import { randomUUID } from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import {
   CreateRepositoryTransactionFactory,
   RepositoryType,
-} from "./repositoryFactory";
+} from './repositoryFactory';
 
 export enum TransactionsEnum {
-  DEBIT = "DEBIT",
-  CREDIT = "CREDIT",
-  LOAN = "LOAN",
-  PURCHASE = "PURCHASE",
+  DEBIT = 'DEBIT',
+  CREDIT = 'CREDIT',
+  LOAN = 'LOAN',
+  PURCHASE = 'PURCHASE',
 }
 
 export enum TransactionStatus {
-  SUCCESS = "SUCCESS",
-  FAILED = "FAILED",
-  PENDING = "PENDING",
-  CANCELLED = "CANCELLED",
+  SUCCESS = 'SUCCESS',
+  FAILED = 'FAILED',
+  PENDING = 'PENDING',
+  CANCELLED = 'CANCELLED',
 }
 
 export interface LedgerInterface {
@@ -53,7 +53,7 @@ class LedgerTransactionReference implements TransactionReference {
   constructor(private transaction: boolean) {}
   GenerateLedgerTransactionID(): string {
     if (this.transaction) return randomUUID();
-    throw new Error("No transaction takes place.");
+    throw new Error('No transaction takes place.');
   }
 }
 
@@ -62,10 +62,10 @@ class LedgerTrasctionsFactory
   implements LedgerTransactions<LedgerInterface>
 {
   private ledger: LedgerInterface[] = [];
-  private database: string = "transactionLedger.json";
+  private database: string = 'transactionLedger.json';
   private repositoryFactory: CreateRepositoryTransactionFactory =
     new CreateRepositoryTransactionFactory({
-      Host: "",
+      Host: '',
       Port: 1,
       Database: this.database,
       DatabaseType: RepositoryType.POSTGRES,
@@ -77,7 +77,7 @@ class LedgerTrasctionsFactory
       try {
         const data = fs.readFileSync(
           path.join(__dirname, this.database),
-          "utf8",
+          'utf8',
         );
         this.ledger = JSON.parse(data);
       } catch (error) {}
@@ -131,6 +131,6 @@ function create(create: LedgerTransactionFactory) {
   //   LedgerUpdatedAt: new Date(),
   // });
   console.log(
-    transaction.ViewLedger("s234556", "99fce342-1e86-451e-9cd5-c22f015531f8"),
+    transaction.ViewLedger('s234556', '99fce342-1e86-451e-9cd5-c22f015531f8'),
   );
 }

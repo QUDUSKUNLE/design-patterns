@@ -1,4 +1,4 @@
-import { randomInt } from "crypto";
+import { randomInt } from 'crypto';
 
 interface Student {
   fullName(): string;
@@ -23,10 +23,10 @@ class CreateStudent implements Student {
     return `${randomInt(1234)}`;
   }
   department(): string {
-    return "Physics Department";
+    return 'Physics Department';
   }
   courses(): string[] {
-    return ["English", "Mathematics", "Yoruba"];
+    return ['English', 'Mathematics', 'Yoruba'];
   }
 }
 

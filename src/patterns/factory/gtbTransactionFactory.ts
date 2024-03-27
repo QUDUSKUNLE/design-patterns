@@ -1,17 +1,17 @@
-import { randomUUID } from "crypto";
-import fs from "fs";
-import path from "path";
+import { randomUUID } from 'crypto';
+import fs from 'fs';
+import path from 'path';
 import {
   CreateLedgerTransactionFactory,
   LedgerTransactions,
   LedgerInterface,
   TransactionsEnum,
   TransactionStatus,
-} from "./ledgerFactory";
+} from './ledgerFactory';
 import {
   CreateRepositoryTransactionFactory,
   RepositoryType,
-} from "./repositoryFactory";
+} from './repositoryFactory';
 
 interface Ledger {
   Balance: number;
@@ -21,17 +21,17 @@ interface Ledger {
 }
 
 enum LendStatus {
-  APPROVED = "APPROVED",
-  DECLINED = "DECLINED",
-  PENDING = "PENDING",
-  PAID = "PAID",
+  APPROVED = 'APPROVED',
+  DECLINED = 'DECLINED',
+  PENDING = 'PENDING',
+  PAID = 'PAID',
 }
 
 enum PaymentSchedule {
-  DAILY = "DAILY",
-  WEEKLY = "WEEKLY",
-  MONTHLY = "MONTHLY",
-  YEARLY = "YEARLY",
+  DAILY = 'DAILY',
+  WEEKLY = 'WEEKLY',
+  MONTHLY = 'MONTHLY',
+  YEARLY = 'YEARLY',
 }
 
 interface LendTransaction {
@@ -90,7 +90,7 @@ abstract class CustomerTransaction {
 
 class CreateCustomerTransactions implements Transaction {
   private customer: Ledger;
-  private database: string = "ledger.json";
+  private database: string = 'ledger.json';
   private ledger: Record<string, Ledger> = {};
   private ledgerFactory: CreateLedgerTransactionFactory =
     new CreateLedgerTransactionFactory(true);
@@ -98,7 +98,7 @@ class CreateCustomerTransactions implements Transaction {
     this.ledgerFactory.FactoryMethod();
   private repositoryFactory: CreateRepositoryTransactionFactory =
     new CreateRepositoryTransactionFactory({
-      Host: "",
+      Host: '',
       Port: 1,
       Database: this.database,
       DatabaseType: RepositoryType.POSTGRES,
@@ -110,7 +110,7 @@ class CreateCustomerTransactions implements Transaction {
       try {
         const data = fs.readFileSync(
           path.join(__dirname, this.database),
-          "utf8",
+          'utf8',
         );
         this.ledger = JSON.parse(data);
       } catch (error) {
@@ -122,7 +122,7 @@ class CreateCustomerTransactions implements Transaction {
 
   async ApproveBorrows(approve: ApproveBorrows): Promise<void> {
     if (this.accountNumber === approve.LenderID) {
-      throw new Error("You can't approve your loan.");
+      throw new Error('You can\'t approve your loan.');
     }
     await this.approveLends(approve);
     switch (approve.Status) {
@@ -194,7 +194,7 @@ class CreateCustomerTransactions implements Transaction {
         TransactionID: ID,
         AccountID: this.accountNumber,
         TransactionType: TransactionsEnum.DEBIT,
-        TransferBankID: "2",
+        TransferBankID: '2',
         Status: TransactionStatus.PENDING,
         Amount: amount,
         LedgerCreatedAt: new Date(),
@@ -202,7 +202,7 @@ class CreateCustomerTransactions implements Transaction {
       });
       return;
     }
-    throw new Error("Unknown customer.");
+    throw new Error('Unknown customer.');
   }
 
   Credits(amount: number): void {
@@ -214,7 +214,7 @@ class CreateCustomerTransactions implements Transaction {
       TransactionID: ID,
       AccountID: this.accountNumber,
       TransactionType: TransactionsEnum.CREDIT,
-      TransferBankID: "2",
+      TransferBankID: '2',
       Status: TransactionStatus.PENDING,
       Amount: amount,
       LedgerCreatedAt: new Date(),
@@ -224,7 +224,7 @@ class CreateCustomerTransactions implements Transaction {
 
   async Lends(lend: LendTransaction): Promise<void> {
     if (this.accountNumber === lend.BorrowerID)
-      throw new Error("You can't lend yourself money.");
+      throw new Error('You can\'t lend yourself money.');
     if (this.customer && this.customer.Balance >= 5000) {
       [lend.PaidTimes, lend.HavePaid] = [0, 0];
       this.ledger[this.accountNumber].Lend.push(lend);
@@ -244,17 +244,17 @@ class CreateCustomerTransactions implements Transaction {
       await this.borrow(borrow);
       this.repository.Write(this.ledger);
     }
-    throw new Error("Authorized to perform this transaction");
+    throw new Error('Authorized to perform this transaction');
   }
 
   private borrow(borrow: BorrowTransaction): boolean {
     const borrowerID = borrow?.BorrowerID as string;
     const borrower = this.ledger[borrowerID];
     if (borrower && borrower.Balance <= borrow.BorrowAmount)
-      throw new Error("The borrower can't afford this amount at the moment.");
+      throw new Error('The borrower can\'t afford this amount at the moment.');
     delete borrow.BorrowerID;
     if (this.filterBorrower(borrower.Borrow, borrow.LenderID))
-      throw new Error("You have a pending request from this lender.");
+      throw new Error('You have a pending request from this lender.');
     this.ledger[borrowerID].Borrow.push(borrow);
     this.ledger[borrowerID] = borrower;
     this.repository.Write(this.ledger);
@@ -345,4 +345,4 @@ function create(transaction: CustomerTransaction) {
   transact.Credits(50000);
 }
 
-create(new CreateCustomerTransaction("s234556"));
+create(new CreateCustomerTransaction('s234556'));

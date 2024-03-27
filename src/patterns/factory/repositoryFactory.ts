@@ -1,9 +1,9 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
 export enum RepositoryType {
-  MONGODB = "mongodb",
-  POSTGRES = "pg",
+  MONGODB = 'mongodb',
+  POSTGRES = 'pg',
 }
 
 interface Repository {
@@ -46,7 +46,7 @@ class RepositoryTransactionFactory
     try {
       const data = fs.readFileSync(
         path.join(__dirname, this.conn.Database),
-        "utf8",
+        'utf8',
       );
       return JSON.parse(data) as unknown as Record<string, unknown>;
     } catch (error) {
@@ -64,10 +64,10 @@ class RepositoryTransactionFactory
     );
   }
   Edit(): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
   Delete(): void {
-    throw new Error("Method not implemented.");
+    throw new Error('Method not implemented.');
   }
 }
 
