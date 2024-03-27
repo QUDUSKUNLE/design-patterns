@@ -1,41 +1,50 @@
-import { randomUUID } from 'crypto';
-import fs from 'fs';
-import path from 'path';
-import { CreateLedgerTransactionFactory, LedgerTransactions, LedgerInterface, TransactionsEnum, TransactionStatus } from './ledgerFactory';
-import { CreateRepositoryTransactionFactory, RepositoryType } from './repositoryFactory';
+import { randomUUID } from "crypto";
+import fs from "fs";
+import path from "path";
+import {
+  CreateLedgerTransactionFactory,
+  LedgerTransactions,
+  LedgerInterface,
+  TransactionsEnum,
+  TransactionStatus,
+} from "./ledgerFactory";
+import {
+  CreateRepositoryTransactionFactory,
+  RepositoryType,
+} from "./repositoryFactory";
 
 interface Ledger {
   Balance: number;
   Name: string;
-  Lend: LendTransaction[]
-  Borrow: BorrowTransaction[]
+  Lend: LendTransaction[];
+  Borrow: BorrowTransaction[];
 }
 
 enum LendStatus {
-  APPROVED = 'APPROVED',
-  DECLINED = 'DECLINED',
-  PENDING = 'PENDING',
-  PAID = 'PAID'
+  APPROVED = "APPROVED",
+  DECLINED = "DECLINED",
+  PENDING = "PENDING",
+  PAID = "PAID",
 }
 
 enum PaymentSchedule {
-  DAILY = 'DAILY',
-  WEEKLY = 'WEEKLY',
-  MONTHLY = 'MONTHLY',
-  YEARLY = 'YEARLY',
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY",
 }
 
 interface LendTransaction {
   TransactionID: string;
-  LendID: string
+  LendID: string;
   LendAmount: number;
   PaymentRate: number;
   BorrowerID: string;
   PaymentSchedule: PaymentSchedule;
   Status: LendStatus;
   Reference: string;
-  CreatedAt: Date
-  UpdatedAt: Date
+  CreatedAt: Date;
+  UpdatedAt: Date;
   HavePaid?: number;
   PaidTimes?: number;
   ApprovedAmount?: number;
@@ -44,15 +53,15 @@ interface LendTransaction {
 
 interface BorrowTransaction {
   TransactionID: string;
-  BorrowerID?: string
+  BorrowerID?: string;
   BorrowAmount: number;
   PaymentRate: number;
   LenderID: string;
   PaymentSchedule: PaymentSchedule;
   Status: LendStatus;
   Reference: string;
-  CreatedAt: Date
-  UpdatedAt: Date
+  CreatedAt: Date;
+  UpdatedAt: Date;
   HavePaid?: number;
   PaidTimes?: number;
   ApprovedAmount?: number;
@@ -60,9 +69,9 @@ interface BorrowTransaction {
 }
 
 interface ApproveBorrows {
-  TransactionID: string,
-  LenderID: string,
-  Status: LendStatus.APPROVED | LendStatus.DECLINED,
+  TransactionID: string;
+  LenderID: string;
+  Status: LendStatus.APPROVED | LendStatus.DECLINED;
   ApprovedAmount?: number;
 }
 
@@ -71,8 +80,8 @@ interface Transaction {
   Credits(amount: number): void;
   Lends(lend: LendTransaction): void;
   Debts(lendStatus?: LendStatus): void;
-  Borrows(borrowStatus?: LendStatus): void
-  ApproveBorrows(approve: ApproveBorrows): void
+  Borrows(borrowStatus?: LendStatus): void;
+  ApproveBorrows(approve: ApproveBorrows): void;
 }
 
 abstract class CustomerTransaction {
@@ -81,52 +90,75 @@ abstract class CustomerTransaction {
 
 class CreateCustomerTransactions implements Transaction {
   private customer: Ledger;
-  private database: string = 'ledger.json'
-  private ledger: Record<string, Ledger> = {}
-  private ledgerFactory: CreateLedgerTransactionFactory = new CreateLedgerTransactionFactory(true)
-  private logLedger: LedgerTransactions<LedgerInterface> = this.ledgerFactory.FactoryMethod();
-  private repositoryFactory: CreateRepositoryTransactionFactory = new CreateRepositoryTransactionFactory({ Host: '', Port: 1, Database: this.database, DatabaseType: RepositoryType.POSTGRES });
-  private repository = this.repositoryFactory.FactoryMethod()
+  private database: string = "ledger.json";
+  private ledger: Record<string, Ledger> = {};
+  private ledgerFactory: CreateLedgerTransactionFactory =
+    new CreateLedgerTransactionFactory(true);
+  private logLedger: LedgerTransactions<LedgerInterface> =
+    this.ledgerFactory.FactoryMethod();
+  private repositoryFactory: CreateRepositoryTransactionFactory =
+    new CreateRepositoryTransactionFactory({
+      Host: "",
+      Port: 1,
+      Database: this.database,
+      DatabaseType: RepositoryType.POSTGRES,
+    });
+  private repository = this.repositoryFactory.FactoryMethod();
 
   constructor(private accountNumber: string) {
     (() => {
       try {
         const data = fs.readFileSync(
           path.join(__dirname, this.database),
-          'utf8'
-        )
+          "utf8",
+        );
         this.ledger = JSON.parse(data);
       } catch (error) {
         console.log(error);
       }
-    })()
-    this.customer = this.ledger[this.accountNumber]
+    })();
+    this.customer = this.ledger[this.accountNumber];
   }
 
   async ApproveBorrows(approve: ApproveBorrows): Promise<void> {
     if (this.accountNumber === approve.LenderID) {
-      throw new Error('You can\'t approve your loan.')
+      throw new Error("You can't approve your loan.");
     }
     await this.approveLends(approve);
     switch (approve.Status) {
       case LendStatus.APPROVED: {
-        const lend = this.ledger[approve.LenderID].Lend.reduce<LendTransaction>((acc, prev) => {
-          if (prev.TransactionID === approve.TransactionID) {
-            [prev.Status, acc, prev.UpdatedAt, prev.ApprovedAmount] = [approve.Status, prev, new Date(), approve.ApprovedAmount];
-          }
-          return acc;
-        }, {} as LendTransaction)
+        const lend = this.ledger[approve.LenderID].Lend.reduce<LendTransaction>(
+          (acc, prev) => {
+            if (prev.TransactionID === approve.TransactionID) {
+              [prev.Status, acc, prev.UpdatedAt, prev.ApprovedAmount] = [
+                approve.Status,
+                prev,
+                new Date(),
+                approve.ApprovedAmount,
+              ];
+            }
+            return acc;
+          },
+          {} as LendTransaction,
+        );
         if (lend.TransactionID) {
           this.ledger[approve.LenderID].Balance += lend.LendAmount;
         }
       }
       case LendStatus.DECLINED: {
-        this.ledger[approve.LenderID].Lend.reduce<LendTransaction>((acc, prev) => {
-          if (prev.TransactionID === approve.TransactionID) {
-            [prev.Status, acc, prev.UpdatedAt] = [approve.Status, prev, new Date()];
-          }
-          return acc;
-        }, {} as LendTransaction)
+        this.ledger[approve.LenderID].Lend.reduce<LendTransaction>(
+          (acc, prev) => {
+            if (prev.TransactionID === approve.TransactionID) {
+              [prev.Status, acc, prev.UpdatedAt] = [
+                approve.Status,
+                prev,
+                new Date(),
+              ];
+            }
+            return acc;
+          },
+          {} as LendTransaction,
+        );
       }
       default: {
         this.repository.Write(this.ledger);
@@ -135,23 +167,21 @@ class CreateCustomerTransactions implements Transaction {
   }
 
   Borrows(borrowStatus?: LendStatus): BorrowTransaction[] {
-    if (borrowStatus) return this.customer.Borrow.reduce<BorrowTransaction[]>((acc, pre) => {
-      if (pre.Status === borrowStatus) {
-        acc.push(pre);
-      }
-      return acc
-    }, [])
-    return this.customer.Borrow
+    if (borrowStatus)
+      return this.customer.Borrow.reduce<BorrowTransaction[]>((acc, pre) => {
+        if (pre.Status === borrowStatus) acc.push(pre);
+        return acc;
+      }, []);
+    return this.customer.Borrow;
   }
 
   Debts(lendStatus?: LendStatus): LendTransaction[] {
-    if (lendStatus) return this.customer.Lend.reduce<LendTransaction[]>((acc, pre) => {
-      if (pre.Status === lendStatus) {
-        acc.push(pre);
-      }
-      return acc
-    }, [])
-    return this.customer.Lend
+    if (lendStatus)
+      return this.customer.Lend.reduce<LendTransaction[]>((acc, pre) => {
+        if (pre.Status === lendStatus) acc.push(pre);
+        return acc;
+      }, []);
+    return this.customer.Lend;
   }
 
   Debits(amount: number): void {
@@ -160,19 +190,19 @@ class CreateCustomerTransactions implements Transaction {
       this.ledger[this.accountNumber] = this.customer;
       this.repository.Write(this.ledger);
       const ID = this.logLedger.GenerateLedgerTransactionID();
-      this.logLedger.DebitLedger({
+      this.logLedger.WriteLedger({
         TransactionID: ID,
         AccountID: this.accountNumber,
         TransactionType: TransactionsEnum.DEBIT,
-        TransferBankID: '2',
+        TransferBankID: "2",
         Status: TransactionStatus.PENDING,
         Amount: amount,
         LedgerCreatedAt: new Date(),
         LedgerUpdatedAt: new Date(),
-      })
+      });
       return;
     }
-    throw new Error('Unknown customer.');
+    throw new Error("Unknown customer.");
   }
 
   Credits(amount: number): void {
@@ -180,21 +210,21 @@ class CreateCustomerTransactions implements Transaction {
     this.ledger[this.accountNumber] = this.customer;
     this.repository.Write(this.ledger);
     const ID = this.logLedger.GenerateLedgerTransactionID();
-    this.logLedger.CreditLedger({
+    this.logLedger.WriteLedger({
       TransactionID: ID,
       AccountID: this.accountNumber,
       TransactionType: TransactionsEnum.CREDIT,
-      TransferBankID: '2',
+      TransferBankID: "2",
       Status: TransactionStatus.PENDING,
       Amount: amount,
       LedgerCreatedAt: new Date(),
       LedgerUpdatedAt: new Date(),
-    })
+    });
   }
 
   async Lends(lend: LendTransaction): Promise<void> {
-    if (this.accountNumber === lend.BorrowerID) throw new Error(
-      'You can\'t lend yourself money.')
+    if (this.accountNumber === lend.BorrowerID)
+      throw new Error("You can't lend yourself money.");
     if (this.customer && this.customer.Balance >= 5000) {
       [lend.PaidTimes, lend.HavePaid] = [0, 0];
       this.ledger[this.accountNumber].Lend.push(lend);
@@ -210,22 +240,22 @@ class CreateCustomerTransactions implements Transaction {
         Reference: lend.Reference,
         CreatedAt: lend.CreatedAt,
         UpdatedAt: lend.UpdatedAt,
-      }
+      };
       await this.borrow(borrow);
       this.repository.Write(this.ledger);
     }
-    throw new Error('Authorized to perform this transaction')
+    throw new Error("Authorized to perform this transaction");
   }
 
   private borrow(borrow: BorrowTransaction): boolean {
-    const borrowerID = borrow?.BorrowerID as string
+    const borrowerID = borrow?.BorrowerID as string;
     const borrower = this.ledger[borrowerID];
-    if (borrower && borrower.Balance <= borrow.BorrowAmount) throw new Error(
-      'The borrower can\'t afford this amount at the moment.')
+    if (borrower && borrower.Balance <= borrow.BorrowAmount)
+      throw new Error("The borrower can't afford this amount at the moment.");
     delete borrow.BorrowerID;
-    if (this.filterBorrower(borrower.Borrow, borrow.LenderID)) throw new Error(
-      'You have a pending request from this lender.')
-    this.ledger[borrowerID].Borrow.push(borrow)
+    if (this.filterBorrower(borrower.Borrow, borrow.LenderID))
+      throw new Error("You have a pending request from this lender.");
+    this.ledger[borrowerID].Borrow.push(borrow);
     this.ledger[borrowerID] = borrower;
     this.repository.Write(this.ledger);
     return true;
@@ -233,14 +263,14 @@ class CreateCustomerTransactions implements Transaction {
 
   private filterBorrower(
     borrow: BorrowTransaction[],
-    lenderID: string
+    lenderID: string,
   ): boolean {
     return borrow.reduce<boolean>((acc, prev) => {
       if (prev.LenderID === lenderID && prev.Status === LendStatus.PENDING) {
-        acc = true
+        acc = true;
       }
       return acc;
-    }, false)
+    }, false);
   }
 
   private approveLends(app: ApproveBorrows): boolean {
@@ -248,15 +278,26 @@ class CreateCustomerTransactions implements Transaction {
     switch (app.Status) {
       case LendStatus.DECLINED:
         result = this.customer.Borrow.reduce<boolean>((acc, pre) => {
-          if (pre.TransactionID === app.TransactionID && pre.Status === LendStatus.PENDING) {
+          if (
+            pre.TransactionID === app.TransactionID &&
+            pre.Status === LendStatus.PENDING
+          ) {
             [pre.Status, acc, pre.UpdatedAt] = [app.Status, true, new Date()];
           }
           return acc;
         }, false);
       case LendStatus.APPROVED:
         result = this.customer.Borrow.reduce<boolean>((acc, pre) => {
-          if (pre.TransactionID === app.TransactionID && pre.Status === LendStatus.PENDING) {
-            [pre.Status, acc, pre.ApprovedAmount, pre.UpdatedAt] = [app.Status, true, app.ApprovedAmount, new Date()];
+          if (
+            pre.TransactionID === app.TransactionID &&
+            pre.Status === LendStatus.PENDING
+          ) {
+            [pre.Status, acc, pre.ApprovedAmount, pre.UpdatedAt] = [
+              app.Status,
+              true,
+              app.ApprovedAmount,
+              new Date(),
+            ];
           }
           return acc;
         }, false);
@@ -273,10 +314,10 @@ class CreateCustomerTransactions implements Transaction {
 
 export class CreateCustomerTransaction extends CustomerTransaction {
   constructor(private readonly accountNumber: string) {
-    super()
+    super();
   }
   public FactoryMethod(): Transaction {
-    return new CreateCustomerTransactions(this.accountNumber)
+    return new CreateCustomerTransactions(this.accountNumber);
   }
 }
 
@@ -304,4 +345,4 @@ function create(transaction: CustomerTransaction) {
   transact.Credits(50000);
 }
 
-create(new CreateCustomerTransaction('s779561'))
+create(new CreateCustomerTransaction("s234556"));

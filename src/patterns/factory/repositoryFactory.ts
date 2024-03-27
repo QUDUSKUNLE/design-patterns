@@ -1,16 +1,16 @@
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
 export enum RepositoryType {
-  MONGODB = 'mongodb',
-  POSTGRES = 'pg'
+  MONGODB = "mongodb",
+  POSTGRES = "pg",
 }
 
 interface Repository {
   Host: string;
   Port: number;
   Database: string;
-  DatabaseType: RepositoryType
+  DatabaseType: RepositoryType;
   Username?: string;
   Password?: string;
 }
@@ -30,19 +30,24 @@ class ConnectRepository {
   constructor(private connect: Repository) {
     (() => {
       if (this.connect.DatabaseType === RepositoryType.MONGODB) return;
-    })()
+    })();
   }
   // Connect database here
 }
 
-class RepositoryTransactionFactory extends ConnectRepository implements RepositoryTransactions {
+class RepositoryTransactionFactory
+  extends ConnectRepository
+  implements RepositoryTransactions
+{
   constructor(private conn: Repository) {
-    super(conn)
+    super(conn);
   }
   async Read(): Promise<Record<string, unknown> | unknown[]> {
     try {
-    const data = fs.readFileSync(
-      path.join(__dirname, this.conn.Database), 'utf8')
+      const data = fs.readFileSync(
+        path.join(__dirname, this.conn.Database),
+        "utf8",
+      );
       return JSON.parse(data) as unknown as Record<string, unknown>;
     } catch (error) {
       throw error;
@@ -51,15 +56,18 @@ class RepositoryTransactionFactory extends ConnectRepository implements Reposito
   Write(record: Record<string, unknown> | unknown[]): void {
     fs.writeFile(
       path.join(__dirname, this.conn.Database),
-      JSON.stringify(record, null, 2), (error) => {
-      if (error) {}
-    })
+      JSON.stringify(record, null, 2),
+      (error) => {
+        if (error) {
+        }
+      },
+    );
   }
   Edit(): void {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
   Delete(): void {
-    throw new Error('Method not implemented.');
+    throw new Error("Method not implemented.");
   }
 }
 
@@ -67,7 +75,7 @@ export class CreateRepositoryTransactionFactory extends RepositoryTransaction {
   constructor(private conn: Repository) {
     super();
   }
-  public FactoryMethod (): RepositoryTransactions {
-    return new RepositoryTransactionFactory(this.conn)
+  public FactoryMethod(): RepositoryTransactions {
+    return new RepositoryTransactionFactory(this.conn);
   }
 }
