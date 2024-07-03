@@ -13,7 +13,7 @@ interface AccountName {
 
 interface Account {
   accountName: string;
-  savingsAccount: string;
+  savingAccount: string;
   currentAccount?: string;
 }
 
@@ -81,17 +81,17 @@ export class CreateCustomerAccounts extends CustomerAccountsFactory {
 function create(gtb: CustomerAccountsFactory, ENUMS: ACCOUNTTYPE): Account {
   switch (ENUMS) {
     case ACCOUNTTYPE.CURRENTS:
-      const current = gtb.FactoryMethod() as CustomerCurrentsInterface;
+      const current = <CustomerCurrentsInterface>gtb.FactoryMethod()
       return {
+        accountName: current.AccountName(),
+        savingAccount: current.SavingsAccountNumber(),
         currentAccount: current.CurrentsAccountNumber(),
-        savingsAccount: current.SavingsAccountNumber(),
-        accountName: current.AccountName()
       }
     }
-  const savings = gtb.FactoryMethod() as CustomerSavingsInterface;
+  const savings = <CustomerSavingsInterface>gtb.FactoryMethod()
   return {
     accountName: savings.AccountName(),
-    savingsAccount: savings.SavingsAccountNumber() 
+    savingAccount: savings.SavingsAccountNumber() 
   }
 }
 
