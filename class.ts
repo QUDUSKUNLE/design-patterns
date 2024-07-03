@@ -6,7 +6,7 @@ class Base {
 
 class Greater extends Base {
   readonly name: string = "Hello World";
-  public constructor(otherName?: string) {
+  constructor(otherName?: string) {
     super();
     this.name = otherName ?? this.name;
   }
@@ -45,15 +45,15 @@ abstract class Bank {
 }
 
 class Customers extends Bank {
-  public constructor(private numbe: number) {
+  public constructor(private number: number) {
     super();
   }
 
   public getCustomerName() {
-    return super.customerName(`${this.numbe}`);
+    return super.customerName(`${this.number}`);
   }
 
   public getCustomerBalance() {
-    return super.customerBalance(`${this.numbe}`);
+    return super.customerBalance(`${this.number}`);
   }
 }

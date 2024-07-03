@@ -1,9 +1,11 @@
 import fs from 'fs';
 import path from 'path';
+import * as cassandra from 'cassandra-driver';
 
 export enum RepositoryType {
   MONGODB = 'mongodb',
   POSTGRES = 'pg',
+  CASSANDRA = 'ca',
 }
 
 interface Repository {
@@ -27,9 +29,17 @@ abstract class RepositoryTransaction {
 }
 
 class ConnectRepository {
+  public database?: cassandra.Client;
   constructor(private connect: Repository) {
     (() => {
       if (this.connect.DatabaseType === RepositoryType.MONGODB) return;
+      if (this.connect.DatabaseType === RepositoryType.CASSANDRA) {
+        this.database = new cassandra.Client({
+          contactPoints: ['h1', 'h2'],
+          localDataCenter: 'datacenter1',
+          keyspace: 'ks2',
+        });
+      }
     })();
   }
   // Connect database here

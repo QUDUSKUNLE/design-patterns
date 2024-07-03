@@ -18,6 +18,7 @@ interface Ledger {
   Name: string;
   Lend: LendTransaction[];
   Borrow: BorrowTransaction[];
+  LendBorrowRepayment?: LendRepaymentType;
 }
 
 enum LendStatus {
@@ -34,39 +35,42 @@ enum PaymentSchedule {
   YEARLY = 'YEARLY',
 }
 
-interface LendTransaction {
+interface LendBorrowTransaction {
   TransactionID: string;
-  LendID: string;
-  LendAmount: number;
   PaymentRate: number;
-  BorrowerID: string;
-  PaymentSchedule: PaymentSchedule;
-  Status: LendStatus;
-  Reference: string;
   CreatedAt: Date;
   UpdatedAt: Date;
+  PaymentSchedule: PaymentSchedule;
+  Status: LendStatus;
+  RepaymentID?: string;
   HavePaid?: number;
   PaidTimes?: number;
+  Reference: string;
   ApprovedAmount?: number;
   Witnesses?: string[];
 }
 
-interface BorrowTransaction {
-  TransactionID: string;
-  BorrowerID?: string;
-  BorrowAmount: number;
-  PaymentRate: number;
+interface LendTransaction extends LendBorrowTransaction {
+  LendAmount: number;
   LenderID: string;
-  PaymentSchedule: PaymentSchedule;
-  Status: LendStatus;
-  Reference: string;
-  CreatedAt: Date;
-  UpdatedAt: Date;
-  HavePaid?: number;
-  PaidTimes?: number;
-  ApprovedAmount?: number;
-  Witnesses?: string[];
+  BorrowerID: string;
 }
+
+interface BorrowTransaction extends LendBorrowTransaction {
+  BorrowAmount: number;
+  LenderID: string;
+  BorrowerID?: string;
+}
+
+
+interface LendRepayment extends Omit<Required<LendBorrowTransaction>, 'PaymentSchedule' | 'Status' | 'Witnesses'> {
+  FullyPaid: boolean;
+}
+
+type LendRepaymentType = {
+  [Property in keyof Pick<Required<LendBorrowTransaction>, 'RepaymentID'>]: LendRepayment[]
+}
+
 
 interface ApproveBorrows {
   TransactionID: string;
@@ -82,6 +86,7 @@ interface Transaction {
   Debts(lendStatus?: LendStatus): void;
   Borrows(borrowStatus?: LendStatus): void;
   ApproveBorrows(approve: ApproveBorrows): void;
+  Repayment(repayment: LendRepayment): void;
 }
 
 abstract class CustomerTransaction {
@@ -120,21 +125,27 @@ class CreateCustomerTransactions implements Transaction {
     this.customer = this.ledger[this.accountNumber];
   }
 
+  Repayment(repayment: LendRepayment): void {
+    throw new Error('Method not implemented.');
+  }
+
   async ApproveBorrows(approve: ApproveBorrows): Promise<void> {
     if (this.accountNumber === approve.LenderID) {
       throw new Error('You can\'t approve your loan.');
     }
-    await this.approveLends(approve);
+    const repaymentID = this.logLedger.GenerateLedgerTransactionID();
+    await this.approveLends(approve, repaymentID);
     switch (approve.Status) {
       case LendStatus.APPROVED: {
         const lend = this.ledger[approve.LenderID].Lend.reduce<LendTransaction>(
           (acc, prev) => {
             if (prev.TransactionID === approve.TransactionID) {
-              [prev.Status, acc, prev.UpdatedAt, prev.ApprovedAmount] = [
+              [prev.Status, acc, prev.UpdatedAt, prev.ApprovedAmount, prev.RepaymentID] = [
                 approve.Status,
                 prev,
                 new Date(),
                 approve.ApprovedAmount,
+                repaymentID,
               ];
             }
             return acc;
@@ -273,7 +284,7 @@ class CreateCustomerTransactions implements Transaction {
     }, false);
   }
 
-  private approveLends(app: ApproveBorrows): boolean {
+  private approveLends(app: ApproveBorrows, repaymentID?: string): boolean {
     let result = false;
     switch (app.Status) {
       case LendStatus.DECLINED:
@@ -292,11 +303,12 @@ class CreateCustomerTransactions implements Transaction {
             pre.TransactionID === app.TransactionID &&
             pre.Status === LendStatus.PENDING
           ) {
-            [pre.Status, acc, pre.ApprovedAmount, pre.UpdatedAt] = [
+            [pre.Status, acc, pre.ApprovedAmount, pre.UpdatedAt, pre.RepaymentID] = [
               app.Status,
               true,
               app.ApprovedAmount,
               new Date(),
+              repaymentID,
             ];
           }
           return acc;
@@ -323,18 +335,18 @@ export class CreateCustomerTransaction extends CustomerTransaction {
 
 function create(transaction: CustomerTransaction) {
   const transact = transaction.FactoryMethod();
-  // transact.Lends({
-  //   TransactionID: randomUUID(),
-  //   LendAmount: 10000,
-  //   PaymentRate: 100,
-  //   BorrowerID: 's234557',
-  //   LendID: '1',
-  //   Status: LendStatus.PENDING,
-  //   PaymentSchedule: PaymentSchedule.DAILY,
-  //   Reference: 'I would like to lend 1000 from you',
-  //   CreatedAt: new Date(),
-  //   UpdatedAt: new Date(),
-  // })
+  transact.Lends({
+    TransactionID: randomUUID(),
+    LendAmount: 10000,
+    PaymentRate: 100,
+    BorrowerID: 's234557',
+    LenderID: '1',
+    Status: LendStatus.PENDING,
+    PaymentSchedule: PaymentSchedule.DAILY,
+    Reference: 'I would like to lend 1000 from you',
+    CreatedAt: new Date(),
+    UpdatedAt: new Date(),
+  })
   // transact.ApproveBorrows({
   //   TransactionID: '19b55890-2f77-474b-ad8b-26042288c064',
   //   LenderID: 's779561',
@@ -342,7 +354,7 @@ function create(transaction: CustomerTransaction) {
   //   Status: LendStatus.DECLINED,
   // })
   // console.log(transact.Debts(LendStatus.DECLINED))
-  transact.Credits(50000);
+  // transact.Credits(50000);
 }
 
 create(new CreateCustomerTransaction('s234556'));
