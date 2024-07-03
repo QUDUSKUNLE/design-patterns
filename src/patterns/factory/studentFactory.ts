@@ -1,4 +1,4 @@
-import { randomInt } from "crypto";
+import { randomInt } from 'crypto';
 
 interface Student {
   fullName(): string;
@@ -12,26 +12,32 @@ abstract class Flower {
 }
 
 class CreateStudent implements Student {
-  constructor(private firstName: string, private lastName: string) {}
+  constructor(
+    private firstName: string,
+    private lastName: string,
+  ) {}
   fullName(): string {
-    return `${this.firstName.toLowerCase()} ${this.lastName.toUpperCase()}`
+    return `${this.firstName.toLowerCase()} ${this.lastName.toUpperCase()}`;
   }
   matricNumber(): string {
-    return `${randomInt(1234)}`
+    return `${randomInt(1234)}`;
   }
   department(): string {
-    return 'Physics Department'
+    return 'Physics Department';
   }
   courses(): string[] {
-    return ['English', 'Mathematics', 'Yoruba']
+    return ['English', 'Mathematics', 'Yoruba'];
   }
 }
 
 export class CreateFlower extends Flower {
-  constructor(private firstName: string, private lastName: string) {
-    super()
+  constructor(
+    private firstName: string,
+    private lastName: string,
+  ) {
+    super();
   }
   public FactoryMethod(): Student {
-    return new CreateStudent(this.firstName, this.lastName)
+    return new CreateStudent(this.firstName, this.lastName);
   }
 }

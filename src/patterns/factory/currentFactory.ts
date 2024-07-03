@@ -1,3 +1,3 @@
 export interface CurrentsAccount {
-  CurrentsAccountNumber(): string
+  CurrentsAccountNumber(): string;
 }
