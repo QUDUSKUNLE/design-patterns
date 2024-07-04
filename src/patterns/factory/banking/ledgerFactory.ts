@@ -37,16 +37,17 @@ interface TransactionReference {
   GenerateLedgerTransactionID(): string;
 }
 
-export interface LedgerTransactions<T> extends TransactionReference {
-  WriteLedger(ok: T): void;
+export interface LedgerTransactions extends TransactionReference {
+  WriteLedger(ok: LedgerInterface): void;
   ViewLedger(
     accountID: string,
     transactionID?: string,
   ): LedgerInterface[] | LedgerInterface;
+  AddAccount(ok: LedgerInterface): void
 }
 
 abstract class LedgerTransactionFactory {
-  public abstract FactoryMethod(): LedgerTransactions<LedgerInterface>;
+  public abstract FactoryMethod(): LedgerTransactions;
 }
 
 class LedgerTransactionReference implements TransactionReference {
@@ -59,7 +60,7 @@ class LedgerTransactionReference implements TransactionReference {
 
 class LedgerTrasctionsFactory
   extends LedgerTransactionReference
-  implements LedgerTransactions<LedgerInterface>
+  implements LedgerTransactions
 {
   private ledger: LedgerInterface[] = [];
   private database: string = 'transactionLedger.json';
@@ -82,6 +83,9 @@ class LedgerTrasctionsFactory
         this.ledger = JSON.parse(data);
       } catch (error) {}
     })();
+  }
+  AddAccount(ok: LedgerInterface): void {
+    throw new Error( 'Method not implemented.' );
   }
   WriteLedger(ok: LedgerInterface): void {
     this.ledger.push(ok);
@@ -112,7 +116,7 @@ export class CreateLedgerTransactionFactory extends LedgerTransactionFactory {
   constructor(private transaction: boolean) {
     super();
   }
-  public FactoryMethod(): LedgerTransactions<LedgerInterface> {
+  public FactoryMethod(): LedgerTransactions {
     return new LedgerTrasctionsFactory(this.transaction);
   }
 }
@@ -132,5 +136,6 @@ function create(create: LedgerTransactionFactory) {
   // });
   console.log(
     transaction.ViewLedger('s234556', '99fce342-1e86-451e-9cd5-c22f015531f8'),
+    // transaction.
   );
 }

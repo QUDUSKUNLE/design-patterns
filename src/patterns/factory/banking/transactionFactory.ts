@@ -3,8 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import {
   CreateLedgerTransactionFactory,
-  LedgerTransactions,
   LedgerInterface,
+  LedgerTransactions,
   TransactionsEnum,
   TransactionStatus,
 } from './ledgerFactory';
@@ -13,7 +13,7 @@ import {
   RepositoryType,
 } from './repositoryFactory';
 
-interface Ledger {
+export interface Ledger {
   Balance: number;
   Name: string;
   Lend: LendTransaction[];
@@ -99,8 +99,7 @@ class CreateCustomerTransactions implements Transaction {
   private ledger: Record<string, Ledger> = {};
   private ledgerFactory: CreateLedgerTransactionFactory =
     new CreateLedgerTransactionFactory(true);
-  private logLedger: LedgerTransactions<LedgerInterface> =
-    this.ledgerFactory.FactoryMethod();
+  private logLedger = <LedgerTransactions>this.ledgerFactory.FactoryMethod();
   private repositoryFactory: CreateRepositoryTransactionFactory =
     new CreateRepositoryTransactionFactory({
       Host: '',
@@ -236,24 +235,19 @@ class CreateCustomerTransactions implements Transaction {
   async Lends(lend: LendTransaction): Promise<void> {
     if (this.accountNumber === lend.BorrowerID)
       throw new Error('You can\'t lend yourself money.');
+    // Customer can lend money if a customer has more than 5000 in the account
     if (this.customer && this.customer.Balance >= 5000) {
       [lend.PaidTimes, lend.HavePaid] = [0, 0];
       this.ledger[this.accountNumber].Lend.push(lend);
       this.ledger[this.accountNumber] = this.customer;
       const borrow: BorrowTransaction = {
-        TransactionID: lend.TransactionID,
-        BorrowerID: lend.BorrowerID,
-        LenderID: this.accountNumber,
+        ...lend,
         BorrowAmount: lend.LendAmount,
-        PaymentRate: lend.PaymentRate,
-        PaymentSchedule: lend.PaymentSchedule,
-        Status: lend.Status,
-        Reference: lend.Reference,
-        CreatedAt: lend.CreatedAt,
-        UpdatedAt: lend.UpdatedAt,
+        LenderID: this.accountNumber,
       };
       await this.borrow(borrow);
       this.repository.Write(this.ledger);
+      return
     }
     throw new Error('Authorized to perform this transaction');
   }
@@ -269,7 +263,7 @@ class CreateCustomerTransactions implements Transaction {
     this.ledger[borrowerID].Borrow.push(borrow);
     this.ledger[borrowerID] = borrower;
     this.repository.Write(this.ledger);
-    return true;
+    return true
   }
 
   private filterBorrower(
@@ -333,28 +327,28 @@ export class CreateCustomerTransaction extends CustomerTransaction {
   }
 }
 
-function create(transaction: CustomerTransaction) {
+function create(transaction: CustomerTransaction): void {
   const transact = transaction.FactoryMethod();
-  transact.Lends({
-    TransactionID: randomUUID(),
-    LendAmount: 10000,
-    PaymentRate: 100,
-    BorrowerID: 's234557',
-    LenderID: '1',
-    Status: LendStatus.PENDING,
-    PaymentSchedule: PaymentSchedule.DAILY,
-    Reference: 'I would like to lend 1000 from you',
-    CreatedAt: new Date(),
-    UpdatedAt: new Date(),
-  })
-  // transact.ApproveBorrows({
-  //   TransactionID: '19b55890-2f77-474b-ad8b-26042288c064',
-  //   LenderID: 's779561',
-  //   ApprovedAmount: 10000,
-  //   Status: LendStatus.DECLINED,
+  // transact.Lends({
+  //   TransactionID: randomUUID(),
+  //   LendAmount: 10000,
+  //   PaymentRate: 100,
+  //   BorrowerID: 'c887811',
+  //   LenderID: '1',
+  //   Status: LendStatus.PENDING,
+  //   PaymentSchedule: PaymentSchedule.DAILY,
+  //   Reference: 'I would like to lend 1000 from you',
+  //   CreatedAt: new Date(),
+  //   UpdatedAt: new Date(),
   // })
-  // console.log(transact.Debts(LendStatus.DECLINED))
+  // transact.ApproveBorrows({
+  //   TransactionID: 'e59bf486-15fc-4553-92f0-76a26f01dfd7',
+  //   LenderID: 's310745',
+  //   ApprovedAmount: 10000,
+  //   Status: LendStatus.APPROVED,
+  // })
+  console.log(transact.Borrows(LendStatus.APPROVED))
   // transact.Credits(50000);
 }
 
-create(new CreateCustomerTransaction('s234556'));
+create(new CreateCustomerTransaction('c887811'));
