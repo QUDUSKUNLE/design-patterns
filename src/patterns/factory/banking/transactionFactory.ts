@@ -347,7 +347,9 @@ function create(transaction: CustomerTransaction): void {
   //   ApprovedAmount: 10000,
   //   Status: LendStatus.APPROVED,
   // })
-  console.log(transact.Borrows(LendStatus.APPROVED))
+  // console.log(transact.Borrows(LendStatus.APPROVED))
+  // const borrow = transact.Lends()
+  // console.log(borrow)
   // transact.Credits(50000);
 }
 

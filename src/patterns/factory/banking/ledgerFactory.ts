@@ -43,7 +43,6 @@ export interface LedgerTransactions extends TransactionReference {
     accountID: string,
     transactionID?: string,
   ): LedgerInterface[] | LedgerInterface;
-  AddAccount(ok: LedgerInterface): void
 }
 
 abstract class LedgerTransactionFactory {
@@ -83,9 +82,6 @@ class LedgerTrasctionsFactory
         this.ledger = JSON.parse(data);
       } catch (error) {}
     })();
-  }
-  AddAccount(ok: LedgerInterface): void {
-    throw new Error( 'Method not implemented.' );
   }
   WriteLedger(ok: LedgerInterface): void {
     this.ledger.push(ok);
