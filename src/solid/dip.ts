@@ -54,11 +54,11 @@ class Switchs {
 }
 
 // Another dip implementation
-interface Order {
+interface Orders {
   id?: string;
 }
 
-interface Update extends Required<Order> {}
+interface Update extends Required<Orders> {}
 
 // Another set of DIP
 interface Database {
