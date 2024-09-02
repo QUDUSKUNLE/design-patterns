@@ -5,7 +5,7 @@
  * This is recognized by creation methods that construct objects from concrete
  * classes.
  * While concrete classes are used during the object creation, the return type
- * of teh factory methods is usually declared as either an abstract class or an
+ * of the factory methods is usually declared as either an abstract class or an
  * interface.
  */
 

@@ -19,7 +19,6 @@ set.add({ title: 'a', author: 'Muhsinah' })
 set.add({ title: 'b', body: 'abc', author: 'Abdul-Muhsin'})
 
 for (const x of set) {
-  console.log(Number.MAX_VALUE)
   console.log(x.title, x.author ?? 'author', x.body ?? 'body')
 }
 

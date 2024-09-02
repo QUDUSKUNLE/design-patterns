@@ -4,7 +4,7 @@ export interface Message {
   body?: string;
   author?: string;
 }
-//A map use a key value in JavaScript
+// A map use a key value in JavaScript
 const map = new Map<string, Message>();
 
 // Map functions

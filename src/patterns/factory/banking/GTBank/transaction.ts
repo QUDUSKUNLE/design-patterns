@@ -1,41 +1,39 @@
 type Savings = {
-  Savings(acc: Transact): void
+  Savings(acc: SavingsInterface): void
 }
 
 type Debits = {
-  Debit(acc: Required<Transact>): void
+  Debit(acc: DebitInterface): void
 }
 
-type Transact = {
+type SavingsInterface = {
   AccountNumber: string;
   Amount: number;
-  TransactionType: TransactionType;
-  TransferAccount?: string;
-}
+  TransactionType: TransactionType.SAVINGS;
+} 
 
-interface Transaction extends Savings, Debits {}
+type DebitInterface = {
+  TransferAccount: string;
+  // TransactionType: TransactionType.DEBIT;
+} & SavingsInterface
+
 
 enum TransactionType {
   DEBIT = 'DEBIT',
   SAVINGS = 'SAVINGS'
 }
 
-class SavingsTransaction implements Savings {
-  Savings(acc: Transact): void {
-    console.log(`Savings ${acc.Amount} in ${acc.AccountNumber}`)
+class DebitClass implements Debits {
+  Debit(acc: DebitInterface): void {
+    console.log(`N${acc.Amount} debited in ${acc.AccountNumber} by transferring to ${acc.TransferAccount}`)
   }
 }
 
-class TransactionClass extends SavingsTransaction implements Transaction {
-  constructor() {
-    super();
-  }
-  Debit(acc: Required<Transact>): void {
-    if (!acc.TransferAccount) {
-      throw new Error(`Cannot perform the operation now, the transferAccount number is required`)
-    }
-    console.log(`Debit ${acc.Amount} in ${acc.AccountNumber} by transferring to ${acc.TransferAccount}`)
+class SavingsClass implements Savings {
+  Savings(acc: SavingsInterface): void {
+    console.log(`N${acc.Amount} saved successfully in ${acc.AccountNumber}.`)
   }
 }
 
-export { TransactionClass, Transaction, Transact, TransactionType }
+
+export { SavingsClass, DebitClass, DebitInterface, SavingsInterface, TransactionType }

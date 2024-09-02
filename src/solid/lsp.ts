@@ -18,11 +18,17 @@ interface Flyable {
   fly(): void
 }
 
+interface Walkable {
+  work(): void
+}
+
 class Bird implements Flyable {
   fly(): void {}
 }
 
-class Penguin implements Flyable {
-  // Can't fly but still implements fly for consistency
+class Duck implements Flyable, Walkable {
+  work(): void {
+    throw new Error( "Method not implemented." )
+  }
   fly(): void {}
 }
