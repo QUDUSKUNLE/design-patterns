@@ -26,5 +26,21 @@ const towSum = (arr: number[], target: number): number[] => {
   throw new Error('No two sum solution')
 }
 
-console.log(twoSum([1,2,3,4,5,6,7,9], 9))
-console.log(towSum([1,2,3,4,5,6,7,9], 9))
+const findTwoSumIndexed = (arr: Array<number>, target: number): number[] => {
+  let left = 0, right = arr.length - 1;
+  while (left < right) {
+    let sum = arr[left] + arr[right]
+    if (sum < target) {
+      left++;
+    } else if (sum > target) {
+      right--;
+    } else {
+      return [left + 1, right + 1]
+    }
+  }
+  throw new Error('No two sum solution')
+}
+
+// console.log(twoSum([1,2,3,4,5,6,7,9], 9))
+// console.log(towSum([1,2,3,4,5,6,7,9], 9))
+console.log(findTwoSumIndexed([1,2,3,4,5,6,7,9], 20))
