@@ -1,4 +1,5 @@
-/* Builder Pattern is a creational pattern which allows to create complex
+/*
+* Builder Pattern is a creational pattern which allows to create complex
 * objects in an easy way
 */ 
 
