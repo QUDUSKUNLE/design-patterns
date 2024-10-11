@@ -17,6 +17,8 @@
     "cassandra-driver": "^4.7.2",
     "chalk": "^5.0.1",
     "g": "^2.0.1",
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.7.1",
     "unique-names-generator": "^4.7.1"
   }
 }
