@@ -12,7 +12,6 @@ router.post('/albums', async (req, res) => {
     const result = await albumConstructor.save();
     return res.status(201).json({ data: result });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ data: error });
   }
 })
@@ -22,7 +21,6 @@ router.get('/albums', async (req, res) => {
     const result = await Album.find({});
     return res.status(200).json({ data: result });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ data: error });
   }
 })
@@ -33,7 +31,6 @@ router.get('/albums/:id', async (req, res) => {
     const result = await Album.findById({ _id: id });
     return res.status(200).json({ data: result });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ data: error });
   }
 })
@@ -45,7 +42,6 @@ router.put('/albums/:id', async (req, res) => {
     const result = await Album.findOneAndUpdate({ _id: id }, { title, performer, cost}, { new: true });
     return res.status(200).json({ data: result });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ data: error });
   }
 })
@@ -56,7 +52,6 @@ router.delete('/albums/:id', async (req, res) => {
     await Album.findOneAndDelete({ _id: id });
     return res.status(204).json();
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ data: error });
   }
 })
@@ -77,7 +72,6 @@ router.post('/purchases', async (req, res) => {
     const data = await Purchase.findById({ _id: result._id }).populate('album').populate('user').exec()
     return res.status(201).json({ data });
   } catch (error) {
-    console.log(error);
     return res.status(500).json({ data: error });
   }
 })
