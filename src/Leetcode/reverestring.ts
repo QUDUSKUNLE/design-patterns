@@ -7,7 +7,3 @@ const reverseString = (str: string): string => {
   }
   return result
 }
-
-const names = 'My name is Abdul-Muhsin Abdul-Quddus Yekeen'
-console.log(reverseString('the sky is blue'))
-console.log(reverseString(names))

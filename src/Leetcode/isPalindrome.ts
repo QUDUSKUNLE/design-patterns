@@ -8,5 +8,3 @@ function isPalindrome(str: number): boolean {
   }
   return parseInt(newString, 10) === str ? true : false;
 }
-
-console.log(isPalindrome(1111))

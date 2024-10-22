@@ -17,5 +17,3 @@ const longestSubstring = (str: string): string => {
   }
   return largestSubstring;
 }
-
-console.log(longestSubstring('bbbbbbb'))

@@ -20,5 +20,3 @@ const returnMissingRange = (num: Array<number>): Array<string> => {
   }
   return result
 }
-
-console.log(returnMissingRange([0, 1, 5, 7, 8, 23, 24, 42, 43, 50, 65, 67, 75, 80, 97, 99]))

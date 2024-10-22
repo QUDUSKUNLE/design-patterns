@@ -5,5 +5,3 @@ const LengthOfLastWord = (str: string): number => {
   }
   return max
 }
-
-console.log(LengthOfLastWord("   fly me   to   the moon  yes sir Abdul-Muhsin"))

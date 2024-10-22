@@ -40,7 +40,3 @@ const findTwoSumIndexed = (arr: Array<number>, target: number): number[] => {
   }
   throw new Error('No two sum solution')
 }
-
-// console.log(twoSum([1,2,3,4,5,6,7,9], 9))
-// console.log(towSum([1,2,3,4,5,6,7,9], 9))
-console.log(findTwoSumIndexed([1,2,3,4,5,6,7,9], 20))
