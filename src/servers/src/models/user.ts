@@ -1,7 +1,11 @@
 import { Schema } from 'mongoose';
 import mongoose from 'mongoose';
 
-const User = mongoose.model('User', new Schema({
+interface UserInterface {
+  name: string;
+}
+
+const User = mongoose.model<UserInterface>('User', new Schema({
   name: { type: String }
 }))
 
