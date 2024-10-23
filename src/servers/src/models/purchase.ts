@@ -1,5 +1,4 @@
-import { Schema, Types } from 'mongoose';
-import mongoose from 'mongoose';
+import mongoose, { Schema, Types } from 'mongoose';
 
 interface PurchaseInterface {
   user: Types.ObjectId,
