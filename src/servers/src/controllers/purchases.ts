@@ -15,9 +15,9 @@ class PurchaseController {
         userConstructor.save(),
         albumConstructor.save()
       ]);
-      const purchaseConstructor = new Purchase({ user: user._id, album: album._id })
+      const purchaseConstructor = new Purchase({ user: user._id, album: album._id });
       const result = await purchaseConstructor.save();
-      const data = await Purchase.findById({ _id: result._id }).populate('album').populate('user').exec()
+      const data = await Purchase.findById({ _id: result._id }).populate('album').populate('user').exec();
       return res.status(201).json({ data });
     } catch (error) {
       return res.status(500).json({ data: error });
